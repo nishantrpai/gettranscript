@@ -8,7 +8,6 @@ function openTranscripts() {
 }
 
 function getTranscripts() {
-  console.log('getting transcripts');
   let transcripts = document.querySelectorAll('#body > ytd-transcript-body-renderer > div');
   let tsText = [];
   for (let i = 0; i < transcripts.length; i++) {
@@ -38,7 +37,7 @@ function saveTranscripts(transcriptArr) {
   console.log('save transcripts');
   for (let i = 0; i < transcriptArr.length; i++) {
     let tdata = transcriptArr[i].split('\n');
-    transcript.push(`${tdata[1]}\n${tdata[1].includes('you') ? '\n' : ''}`);
+    transcript.push(`${tdata[1].includes('you') ? '\n' : ''}${tdata[1]}\n`);
   }
   let title = document.querySelector('#container > h1 > yt-formatted-string').innerText;
   saveData(transcript, `${title}.txt`);
