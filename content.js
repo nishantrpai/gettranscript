@@ -84,12 +84,12 @@ function getChildComment(num, transcript, elem) {
 function redditAction() {
   console.log('initiating reddit action');
   let transcript = [];
-  let title = document.querySelector('div.top-matter > p.title').innerText;
+  let title = document.querySelector('div.top-matter > p.title > a').innerText;
   let description = document.querySelector('.expando').innerText;
   let url = location.href;
 
-  transcript.push(`${url}\n`);
-  transcript.push(`${title}\n`);
+  transcript.push(`${url}\n\n`);
+  transcript.push(`${title}\n\n\n`);
   transcript.push(`${description}\n\n`);
 
   let comments = document.querySelectorAll('.nestedlisting > .comment');
