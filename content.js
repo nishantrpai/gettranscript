@@ -58,7 +58,51 @@ function youtubeAction() {
       alert('no transcripts were found');
     }
   }
+}
 
+
+function getChildComment(num, transcript, elem) {
+  // console.log(elem);
+  // console.log(elem.querySelector('.child > .listing').children.length);
+  for (let i = 0; i < elem.querySelector('.child > .listing').children.length; i++) {
+    if (elem.querySelector('.child > .listing').children[i].querySelector('form')) {
+      let comment = elem.querySelector('.child > .listing').children[i].querySelector('form').innerText;
+      let dashes = '';
+      let newlines = '';
+      for (let h = 0; h < num; h++) {
+        dashes += '-';
+        newlines += '\n';
+      }
+      transcript.push(`${dashes} ${comment} ${newlines}`);
+    }
+    if (elem.querySelector('.child > .listing').children[i].querySelector('.child > .listing')) {
+      getChildComment(num + 1, transcript, elem.querySelector('.child > .listing').children[i])
+    }
+  }
+}
+
+function redditAction() {
+  console.log('initiating reddit action');
+  let transcript = [];
+  let title = document.querySelector('div.top-matter > p.title').innerText;
+  let description = document.querySelector('.expando').innerText;
+  let url = location.href;
+
+  transcript.push(`${url}\n`);
+  transcript.push(`${title}\n`);
+  transcript.push(`${description}\n\n`);
+
+  let comments = document.querySelectorAll('.nestedlisting > .comment');
+
+  for (let i = 0; i < comments.length; i++) {
+    //all parent comments
+    transcript.push(`- ${comments[i].querySelector('form').innerText}\n\n`);
+    //all children comments
+    if (comments[i].querySelector('.child > .listing')) {
+      getChildComment(2, transcript, comments[i])
+    }
+  }
+  saveData(transcript, `${title}.txt`);
 }
 
 chrome.runtime.onMessage.addListener(
@@ -66,6 +110,8 @@ chrome.runtime.onMessage.addListener(
     if (request.message === "clicked_browser_action") {
       if (location.href.includes('youtube')) {
         youtubeAction();
+      } else if (location.href.includes('reddit')) {
+        redditAction();
       }
     }
   }

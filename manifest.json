@@ -13,8 +13,7 @@
         "<all_urls>"
       ],
       "js": [
-        "content.js",
-        "https://cdnjs.cloudflare.com/ajax/libs/nlp_compromise/6.5.5/nlp_compromise.min.js"
+        "content.js"
       ]
     }
   ],
