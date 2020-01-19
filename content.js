@@ -63,7 +63,7 @@ function youtubeAction() {
 function formatText(num, comment) {
   let dashes = '';
   for (let h = 0; h < num; h++) {
-    dashes += 'x';
+    dashes += 'xx';
   }
   comment = comment.replace(/\n/g, " , ");
   let commentArr = comment.split(' ');
@@ -72,7 +72,7 @@ function formatText(num, comment) {
   for (let k = 0; k < commentArr.length; k++) {
     let word = commentArr[k];
 
-    if (count > 190 && count < 250) {
+    if (count > 70) {
       updatedComment += `\n${dashes}`;
       count = dashes.length;
     }
@@ -122,16 +122,17 @@ function redditAction() {
   for (let i = 0; i < comments.length; i++) {
     //all parent comments
     transcript.push('------------------------------------------------\n\n')
-    let comment = comments[i].querySelector('form').innerText;
-    comment = formatText(1, comment);
-    transcript.push(`${comment}\n\n\n`);
-
+    if (comments[i].querySelector('form')) {
+      let comment = comments[i].querySelector('form').innerText;
+      comment = formatText(1, comment);
+      transcript.push(`${comment}\n\n\n`);
+    }
     //all children comments
     if (comments[i].querySelector('.child > .listing')) {
       getChildComment(2, transcript, comments[i])
     }
   }
-  saveData(transcript, `${title}.txt`);
+  saveData(transcript, `${title}.docx`);
 }
 
 chrome.runtime.onMessage.addListener(
