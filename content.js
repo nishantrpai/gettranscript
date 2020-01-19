@@ -60,6 +60,35 @@ function youtubeAction() {
   }
 }
 
+function formatText(num, comment) {
+  let dashes = '';
+  for (let h = 0; h < num; h++) {
+    dashes += 'x';
+  }
+  comment = comment.replace(/\n/g, " , ");
+  let commentArr = comment.split(' ');
+  let count = dashes.length;
+  let updatedComment = `${dashes}`;
+  for (let k = 0; k < commentArr.length; k++) {
+    let word = commentArr[k];
+
+    if (count > 190 && count < 250) {
+      updatedComment += `\n${dashes}`;
+      count = dashes.length;
+    }
+
+    if (word == ',') {
+      updatedComment += `\n${dashes}`;
+    }
+    else {
+      updatedComment += ` ${word}`;
+    }
+
+    count += word.length + 1;
+  }
+  return updatedComment;
+}
+
 
 function getChildComment(num, transcript, elem) {
   // console.log(elem);
@@ -67,13 +96,8 @@ function getChildComment(num, transcript, elem) {
   for (let i = 0; i < elem.querySelector('.child > .listing').children.length; i++) {
     if (elem.querySelector('.child > .listing').children[i].querySelector('form')) {
       let comment = elem.querySelector('.child > .listing').children[i].querySelector('form').innerText;
-      let dashes = '';
-      let newlines = '';
-      for (let h = 0; h < num; h++) {
-        dashes += '-';
-        newlines += '\n';
-      }
-      transcript.push(`${dashes} ${comment} ${newlines}`);
+      comment = formatText(num, comment);
+      transcript.push(`${comment}\n\n\n`);
     }
     if (elem.querySelector('.child > .listing').children[i].querySelector('.child > .listing')) {
       getChildComment(num + 1, transcript, elem.querySelector('.child > .listing').children[i])
@@ -89,14 +113,19 @@ function redditAction() {
   let url = location.href;
 
   transcript.push(`${url}\n\n`);
-  transcript.push(`${title}\n\n\n`);
-  transcript.push(`${description}\n\n`);
+  transcript.push(`Title: ${title}\n\n\n`);
+  transcript.push('------------------------------------------------\n\n')
+  transcript.push(`Description: ${description}\n\n`);
 
   let comments = document.querySelectorAll('.nestedlisting > .comment');
 
   for (let i = 0; i < comments.length; i++) {
     //all parent comments
-    transcript.push(`- ${comments[i].querySelector('form').innerText}\n\n`);
+    transcript.push('------------------------------------------------\n\n')
+    let comment = comments[i].querySelector('form').innerText;
+    comment = formatText(1, comment);
+    transcript.push(`${comment}\n\n\n`);
+
     //all children comments
     if (comments[i].querySelector('.child > .listing')) {
       getChildComment(2, transcript, comments[i])
