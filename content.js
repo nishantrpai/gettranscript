@@ -89,6 +89,7 @@ function formatText(num, comment) {
 
     if (word == ',') {
       updatedComment += `\n${dashes}`;
+      count = dashes.length;
     }
     else {
       updatedComment += ` ${word}`;
