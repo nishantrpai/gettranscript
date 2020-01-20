@@ -34,13 +34,23 @@ var saveData = (function () {
 
 function saveTranscripts(transcriptArr) {
   let transcript = [];
-  console.log('save transcripts');
+  
+  let url = location.href;
+  let title = document.querySelector('.title').innerText;
+  let description = document.querySelector('#description').innerText;
+
+  transcript.push(`${url}\n\n`)
+  transcript.push('------------------------------------------------\n\n')
+  transcript.push(`Title: ${title}\n\n`)
+  transcript.push('------------------------------------------------\n\n')
+  transcript.push(`Description\n\n ${description}\n\n`)
+  transcript.push('------------------------------------------------\n\n')
+
   for (let i = 0; i < transcriptArr.length; i++) {
     let tdata = transcriptArr[i].split('\n');
-    transcript.push(`${tdata[1].includes('you') ? '\n' : ''}${tdata[1]}\n`);
+    transcript.push(`\n${tdata[1]}\n`);
   }
-  let title = document.querySelector('#container > h1 > yt-formatted-string').innerText;
-  saveData(transcript, `${title}.txt`);
+  saveData(transcript, `${title}.docx`);
 }
 
 function youtubeAction() {
@@ -48,8 +58,8 @@ function youtubeAction() {
   let transcripts = getTranscripts();
   if (transcripts.length == 0) {
     openTranscripts();
-    //wait 2 secs before getting the transcripts
-    setTimeout(() => { this.getTranscripts().length > 0 ? this.saveTranscripts(this.getTranscripts()) : alert('no transcripts were found'); }, 8000);
+    //wait 9 secs before getting the transcripts
+    setTimeout(() => { this.getTranscripts().length > 0 ? this.saveTranscripts(this.getTranscripts()) : alert('no transcripts were found'); }, 9000);
   } else {
     //if the transcripts are already there, then save it
     if (transcripts.length > 0) {
@@ -91,8 +101,6 @@ function formatText(num, comment) {
 
 
 function getChildComment(num, transcript, elem) {
-  // console.log(elem);
-  // console.log(elem.querySelector('.child > .listing').children.length);
   for (let i = 0; i < elem.querySelector('.child > .listing').children.length; i++) {
     if (elem.querySelector('.child > .listing').children[i].querySelector('form')) {
       let comment = elem.querySelector('.child > .listing').children[i].querySelector('form').innerText;
