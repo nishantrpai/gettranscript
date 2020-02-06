@@ -34,7 +34,7 @@ var saveData = (function () {
 
 function saveTranscripts(transcriptArr) {
   let transcript = [];
-  
+
   let url = location.href;
   let title = document.querySelector('.title').innerText;
   let description = document.querySelector('#description').innerText;
@@ -144,6 +144,32 @@ function redditAction() {
   saveData(transcript, `${title}.docx`);
 }
 
+function trustRadiusReview(reviewDoc) {
+  let review = {};
+
+  let pros = Array.from(reviewDoc.querySelectorAll('.pros > li'));
+  console.log(pros);
+  pros = pros.length > 0 ? pros.map(pro => pro.innerText) : [];
+  review['pros'] = pros;
+
+  let cons = Array.from(reviewDoc.querySelectorAll('.cons > li'));
+  cons = cons.length > 0 ? cons.map(con => con.innerText) : [];
+  review['cons'] = cons;
+
+  console.log(review);
+  return review;
+}
+
+function trustRadiusReviews() {
+  console.log('initiating trustradiusreview action')
+  let reviews = document.querySelectorAll('.search-hits > .serp-row');
+  let allReviews = [];
+  for (let i = 0; i < reviews.length; i++) {
+    allReviews.push(trustRadiusReview(reviews[i]));
+  }
+  console.log(allReviews);
+}
+
 chrome.runtime.onMessage.addListener(
   function (request, sender, sendResponse) {
     if (request.message === "clicked_browser_action") {
@@ -151,6 +177,12 @@ chrome.runtime.onMessage.addListener(
         youtubeAction();
       } else if (location.href.includes('reddit')) {
         redditAction();
+      } else if (location.href.includes('trustradius')) {
+        //trustradius action
+        trustRadiusReviews();
+
+      } else if (location.href.includes('capterra')) {
+        //capterra action
       }
     }
   }
