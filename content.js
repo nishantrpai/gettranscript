@@ -145,29 +145,36 @@ function redditAction() {
 }
 
 function trustRadiusReview(reviewDoc) {
-  let review = {};
+  let review = [];
 
+  review.push('Pros\n\n')
   let pros = Array.from(reviewDoc.querySelectorAll('.pros > li'));
-  console.log(pros);
-  pros = pros.length > 0 ? pros.map(pro => pro.innerText) : [];
-  review['pros'] = pros;
+  pros = pros.map(pro => pro.innerText);
+  for (let i = 0; i < pros.length; i++) {
+    review.push(`${i + 1}. ${pros[i]}\n\n`)
+  }
 
+  review.push('\n\nCons\n\n')
   let cons = Array.from(reviewDoc.querySelectorAll('.cons > li'));
-  cons = cons.length > 0 ? cons.map(con => con.innerText) : [];
-  review['cons'] = cons;
+  cons = cons.map(con => con.innerText);
+  for (let i = 0; i < cons.length; i++) {
+    review.push(`${i + 1}. ${cons[i]}\n\n`)
+  }
 
-  console.log(review);
+  review.push('\n---------------------------\n\n');
   return review;
 }
 
 function trustRadiusReviews() {
   console.log('initiating trustradiusreview action')
   let reviews = document.querySelectorAll('.search-hits > .serp-row');
+  let bits = location.href.split('/');
+  let title = bits[bits.length - 2];
   let allReviews = [];
   for (let i = 0; i < reviews.length; i++) {
-    allReviews.push(trustRadiusReview(reviews[i]));
+    allReviews.push(...trustRadiusReview(reviews[i]));
   }
-  console.log(allReviews);
+  saveData(allReviews, `${title}_trusradius.docx`);
 }
 
 chrome.runtime.onMessage.addListener(
