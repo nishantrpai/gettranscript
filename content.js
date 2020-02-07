@@ -1,3 +1,5 @@
+let allReviews = [];
+
 function openTranscripts() {
   let menu = document.querySelector('[aria-label="More actions"]');
   menu.click();
@@ -22,7 +24,7 @@ var saveData = (function () {
   document.body.appendChild(a);
   a.style = "display: none";
   return function (data, fileName) {
-    blob = new Blob(data, { type: "text/plain" }),
+    blob = new Blob(data, { type: "text/html" }),
       url = window.URL.createObjectURL(blob);
     a.href = url;
     a.download = fileName;
@@ -147,6 +149,9 @@ function redditAction() {
 function trustRadiusReview(reviewDoc) {
   let review = [];
 
+  let score = reviewDoc.querySelector('.trust-score__score').children[1].innerText.split(' out of ').join('/');
+  review.push(`Score: ${score}\n\n`);
+
   review.push('Pros\n\n')
   let pros = Array.from(reviewDoc.querySelectorAll('.pros > li'));
   pros = pros.map(pro => pro.innerText);
@@ -165,16 +170,35 @@ function trustRadiusReview(reviewDoc) {
   return review;
 }
 
+function getTrustNxtPage() {
+  let pages = document.querySelector('.pagination').children;
+  for (let i = 0; i < pages.length; i++) {
+    if (pages[i].classList.contains('active')) {
+      console.log(i);
+      if (i < pages.length - 1) {
+        return pages[i + 1];
+      }
+    }
+  }
+  return false;
+}
+
 function trustRadiusReviews() {
   console.log('initiating trustradiusreview action')
   let reviews = document.querySelectorAll('.search-hits > .serp-row');
   let bits = location.href.split('/');
   let title = bits[bits.length - 2];
-  let allReviews = [];
   for (let i = 0; i < reviews.length; i++) {
     allReviews.push(...trustRadiusReview(reviews[i]));
   }
-  saveData(allReviews, `${title}_trusradius.docx`);
+  let nextPage = getTrustNxtPage();
+  if (nextPage) {
+    nextPage.querySelector('a').click();
+    setTimeout(() => { trustRadiusReviews() }, 2000)
+  }
+  else {
+    saveData(allReviews, `${title}_trusradius.docx`);
+  }
 }
 
 chrome.runtime.onMessage.addListener(
@@ -186,6 +210,7 @@ chrome.runtime.onMessage.addListener(
         redditAction();
       } else if (location.href.includes('trustradius')) {
         //trustradius action
+        allReviews = [];
         trustRadiusReviews();
 
       } else if (location.href.includes('capterra')) {
