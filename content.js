@@ -146,37 +146,51 @@ function redditAction() {
   saveData(transcript, `${title}.docx`);
 }
 
+function dateDiff(date1, date2) {
+  let diffTime = Math.abs(date2 - date1);
+  let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays;
+}
+
 function trustRadiusReview(reviewDoc) {
   let review = [];
-
   let score = reviewDoc.querySelector('.trust-score__score').children[1].innerText.split(' out of ').join('/');
-  review.push(`Score: ${score}\n\n`);
+  let date = reviewDoc.querySelector('.review-date').innerText;
 
-  review.push('Pros\n\n')
-  let pros = Array.from(reviewDoc.querySelectorAll('.pros > li'));
-  pros = pros.map(pro => pro.innerText);
-  for (let i = 0; i < pros.length; i++) {
-    review.push(`${i + 1}. ${pros[i]}\n\n`)
+  let reviewDate = new Date(date);
+  let today = new Date();
+  let datediff = dateDiff(today, reviewDate);
+
+  if (datediff < 120) {
+    review.push(`Score: ${score}\n\n`);
+    review.push(`${date}\n\n`)
+    review.push('Pros\n\n')
+    let pros = Array.from(reviewDoc.querySelectorAll('.pros > li'));
+    pros = pros.map(pro => pro.innerText);
+    for (let i = 0; i < pros.length; i++) {
+      review.push(`${i + 1}. ${pros[i]}\n\n`)
+    }
+    review.push('Cons\n\n')
+    let cons = Array.from(reviewDoc.querySelectorAll('.cons > li'));
+    cons = cons.map(con => con.innerText);
+    for (let i = 0; i < cons.length; i++) {
+      review.push(`${i + 1}. ${cons[i]}\n\n`)
+    }
+    review.push('---------------------------\n\n');
+    return review;
   }
-
-  review.push('\n\nCons\n\n')
-  let cons = Array.from(reviewDoc.querySelectorAll('.cons > li'));
-  cons = cons.map(con => con.innerText);
-  for (let i = 0; i < cons.length; i++) {
-    review.push(`${i + 1}. ${cons[i]}\n\n`)
-  }
-
-  review.push('\n---------------------------\n\n');
-  return review;
+  return null;
 }
 
 function getTrustNxtPage() {
-  let pages = document.querySelector('.pagination').children;
-  for (let i = 0; i < pages.length; i++) {
-    if (pages[i].classList.contains('active')) {
-      console.log(i);
-      if (i < pages.length - 1) {
-        return pages[i + 1];
+  if (document.querySelector('.pagination')) {
+    let pages = document.querySelector('.pagination').children;
+    for (let i = 0; i < pages.length; i++) {
+      if (pages[i].classList.contains('active')) {
+        console.log(i);
+        if (i < pages.length - 1) {
+          return pages[i + 1];
+        }
       }
     }
   }
@@ -189,7 +203,10 @@ function trustRadiusReviews() {
   let bits = location.href.split('/');
   let title = bits[bits.length - 2];
   for (let i = 0; i < reviews.length; i++) {
-    allReviews.push(...trustRadiusReview(reviews[i]));
+    let review = trustRadiusReview(reviews[i]);
+    if (review) {
+      allReviews.push(...review);
+    }
   }
   let nextPage = getTrustNxtPage();
   if (nextPage) {
