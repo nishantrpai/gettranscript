@@ -214,7 +214,11 @@ function trustRadiusReviews() {
     setTimeout(() => { trustRadiusReviews() }, 2000)
   }
   else {
-    saveData(allReviews, `${title}_trusradius.docx`);
+    if (allReviews.length > 0) {
+      saveData(allReviews, `${title}_trusradius.docx`);
+    } else {
+      alert('No recent reviews');
+    }
   }
 }
 
