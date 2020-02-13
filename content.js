@@ -202,6 +202,8 @@ function trustRadiusReviews() {
   let reviews = document.querySelectorAll('.search-hits > .serp-row');
   let bits = location.href.split('/');
   let title = bits[bits.length - 2];
+  let productDetails = document.querySelector('.product-details > .description').innerText;
+
   for (let i = 0; i < reviews.length; i++) {
     let review = trustRadiusReview(reviews[i]);
     if (review) {
@@ -213,8 +215,11 @@ function trustRadiusReviews() {
     nextPage.querySelector('a').click();
     setTimeout(() => { trustRadiusReviews() }, 2000)
   }
+
   else {
     if (allReviews.length > 0) {
+      allReviews.splice(0, 0, `${productDetails}\n\n`);
+      allReviews.splice(1, 0, '---------------------------\n\n');
       saveData(allReviews, `${title}_trusradius.docx`);
     } else {
       alert('No recent reviews');
